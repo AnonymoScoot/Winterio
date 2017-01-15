@@ -10,6 +10,10 @@ Config["water"] = {}
 Config["offshore-pump"] = {}
 Config["solar-panel"] = {}
 Config["steam-engine"] = {}
+Config["electric-furnace-2"] = {}
+Config["electric-furnace-3"] = {}
+Config["electric-chemical-mixing-furnace"] = {}
+Config["electric-chemical-mixing-furnace-2"] = {}
 
 -- If TRUE, enables balance changes done to make the mod more unique( slower crafting speed and higher energy consumption by burners )
 Config.Balance_Changes = true
@@ -39,9 +43,18 @@ Config["water"].default_temperature = 1
 
 Config["offshore-pump"].pumping_speed = 1
 
-Config["solar-panel"].production = "30kW"
+-- Power generated compared to Vanilla
+Config["solar-panel"].ratio = 0.5
 
 Config["steam-engine"].effectivity = 0.859
+
+-- Bob's mods entities
+Config["electric-furnace-2"].energy_usage = "300kW"
+Config["electric-furnace-3"].energy_usage = "345kW"
+
+Config["electric-chemical-mixing-furnace"].energy_usage = "300kW"
+Config["electric-chemical-mixing-furnace-2"].energy_usage = "345kW"
+
 
 ----------------------------------
 
@@ -52,6 +65,3 @@ Config.SnowMelting_Amount = 10
 -- Sets the time of snow-grabing and the amount, inputs must be real positive number( ex. 1, 2, 0.5 )
 Config.SnowGrab_Time = 0.5 -- Measured in seconds
 Config.SnowGrab_Amount = 1
-
-
-

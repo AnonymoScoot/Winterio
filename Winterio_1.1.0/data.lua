@@ -4,6 +4,12 @@ require("prototypes.recipe")
 require("prototypes.category")
 require("config")
 
+if not bobmods then
+  bobmods = {}
+  bobmods.assembly = {}
+end
+winterio = {}
+
 local tiles = { "grass","grass-dry","grass-medium","sand","sand-dark","dirt","dirt-dark" }
 local water = { "water","water-green","deepwater","deepwater-green" }
 
@@ -69,14 +75,15 @@ for k, v in pairs( tiles ) do
         volume = 0.8
       }
     }
-	data.raw["tile"][v].map_color = {r=0.85, g=0.85, b=0.88}	
-	data.raw["tile"][v].vehicle_friction_modifier = 2	
-
+  data.raw["tile"][v].map_color = {r=0.85, g=0.85, b=0.88}
+  data.raw["tile"][v].vehicle_friction_modifier = 2
+  data.raw["tile"][v].ageing = 0.0002
 
 end
 
 for k, v in pairs( water ) do
 
+	data.raw["tile"][v].ageing = 0.0001
 	data.raw["tile"][v].collision_mask = {"ground-tile"}
 	data.raw["tile"][v].layer = 40
 	data.raw["tile"][v].variants =     
@@ -304,7 +311,8 @@ for k, v in pairs( trees ) do
 
 	data.raw["tree"][v].variations = nil
 	data.raw["tree"][v].pictures = tree_pictures
-	
+	data.raw["tree"][v].emissions_per_tick = -0.0005
+
 end
 
 local decorations = {
@@ -341,40 +349,72 @@ for i = 1,#decorations do
 
 end
 
+function winterio.adjust_production(entity, ratio)
+	local prod = tonumber(string.match(entity.production, '(%d+)'))
+	entity.production =  string.format("%.2fkW", prod * ratio)
+	return
+end
+
 if Config.Balance_Changes == true then
 
-data.raw["furnace"]["stone-furnace"].energy_usage = Config["stone-furnace"].energy_usage
-data.raw["furnace"]["stone-furnace"].crafting_speed = Config["stone-furnace"].crafting_speed
+  data.raw["furnace"]["stone-furnace"].energy_usage = Config["stone-furnace"].energy_usage
+  data.raw["furnace"]["stone-furnace"].crafting_speed = Config["stone-furnace"].crafting_speed
 
-data.raw["furnace"]["steel-furnace"].energy_usage = Config["steel-furnace"].energy_usage
-data.raw["furnace"]["steel-furnace"].crafting_speed = Config["steel-furnace"].crafting_speed
+  data.raw["furnace"]["steel-furnace"].energy_usage = Config["steel-furnace"].energy_usage
+  data.raw["furnace"]["steel-furnace"].crafting_speed = Config["steel-furnace"].crafting_speed
 
-data.raw["furnace"]["electric-furnace"].energy_usage = Config["electric-furnace"].energy_usage
-data.raw["furnace"]["electric-furnace"].crafting_speed = Config["electric-furnace"].crafting_speed
+  data.raw["furnace"]["electric-furnace"].energy_usage = Config["electric-furnace"].energy_usage
+  data.raw["furnace"]["electric-furnace"].crafting_speed = Config["electric-furnace"].crafting_speed
 
-data.raw["inserter"]["burner-inserter"].energy_per_movement = Config["burner-inserter"].energy_per_movement
-data.raw["inserter"]["burner-inserter"].energy_per_rotation = Config["burner-inserter"].energy_per_rotation
+  data.raw["inserter"]["burner-inserter"].energy_per_movement = Config["burner-inserter"].energy_per_movement
+  data.raw["inserter"]["burner-inserter"].energy_per_rotation = Config["burner-inserter"].energy_per_rotation
 
-data.raw["mining-drill"]["burner-mining-drill"].energy_usage = Config["burner-mining-drill"].energy_usage
+  data.raw["mining-drill"]["burner-mining-drill"].energy_usage = Config["burner-mining-drill"].energy_usage
 
-data.raw["boiler"]["boiler"].energy_consumption = Config["boiler"].energy_consumption
+  data.raw["boiler"]["boiler"].energy_consumption = Config["boiler"].energy_consumption
 
-data.raw["fluid"]["water"].default_temperature = Config["water"].default_temperature
+  data.raw["fluid"]["water"].default_temperature = Config["water"].default_temperature
 
-data.raw["offshore-pump"]["offshore-pump"].pumping_speed = Config["offshore-pump"].pumping_speed
+  data.raw["offshore-pump"]["offshore-pump"].pumping_speed = Config["offshore-pump"].pumping_speed
 
-data.raw["solar-panel"]["solar-panel"].production = Config["solar-panel"].production
+  winterio.adjust_production(data.raw["solar-panel"]["solar-panel"], Config["solar-panel"].ratio)
 
-data.raw["generator"]["steam-engine"].effectivity = Config["steam-engine"].effectivity
+  data.raw["generator"]["steam-engine"].effectivity = Config["steam-engine"].effectivity
+
+  if bobmods.plates then
+    data.raw["assembling-machine"]["chemical-boiler"].energy_usage = Config["stone-furnace"].energy_usage
+    data.raw["assembling-machine"]["chemical-furnace"].energy_usage = Config["electric-furnace"].energy_usage
+    data.raw["assembling-machine"]["mixing-furnace"].energy_usage = Config["stone-furnace"].energy_usage
+    data.raw["assembling-machine"]["electric-mixing-furnace"].energy_usage = Config["electric-furnace"].energy_usage
+
+  end
+
+  if bobmods.assembly.Furnaces then
+    data.raw["furnace"]["electric-furnace-2"].energy_usage = Config["electric-furnace-2"].energy_usage
+    data.raw["furnace"]["electric-furnace-3"].energy_usage = Config["electric-furnace-3"].energy_usage
+
+  end
+
+  if bobmods.power then
+    local panels = {
+      "solar-panel-small",
+      "solar-panel-small-2",
+      "solar-panel-small-3",
+      "solar-panel-2",
+      "solar-panel-3",
+      "solar-panel-large",
+      "solar-panel-large-2",
+      "solar-panel-large-3"
+    }
+    for k,v in pairs(panels) do
+      winterio.adjust_production(data.raw["solar-panel"][v], Config["solar-panel"].ratio)
+    end
+  end
 
 end
+
+
 
 data.raw["recipe"]["offshore-pump"].hidden = true
 data.raw["item"]["offshore-pump"].flags = {"goes-to-quickbar","hidden"}
 data.raw["offshore-pump"]["offshore-pump"].minable = {hardness = 0.2, mining_time = 0.5, result = "snow-pump"}
-
-
-
-
-
-

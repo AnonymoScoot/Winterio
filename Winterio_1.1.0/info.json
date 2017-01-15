@@ -6,5 +6,5 @@
 	"author": "AnonymoScoot",
 	"homepage": "https://github.com/AnonymoScoot/Winterio",
 	"description": "Adds winter theme to the game and makes a few (optional) balance changes",
-	"dependencies": ["base >= 0.14.0"]
+	"dependencies": ["base >= 0.14.0", "? bobplates >= 0.13.1", "? bobconfig >= 0.13.0", "? bobpower >= 0.13.1", "? bobassembly >= 0.13.0"]
 }
